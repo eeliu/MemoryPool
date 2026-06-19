@@ -37,15 +37,35 @@ MemoryPool is mostly compliant with the C++ Standard Library allocators. This me
 
 Usage
 -------------------------
-Put `MemoryPool.h` and `MemoryPool.tcc` into your project folder and include `MemoryPool.h` into your project. Do not forget to enable C++11 features (for example, with the `-std=c++11` flag if you use GCC). These files define a single template class in the common namespace:
+Put `MemoryPool.hpp` into your project folder and include `MemoryPool.hpp` into your project. Do not forget to enable C++11 features (for example, with the `-std=c++11` flag if you use GCC). These files define a single template class in the common namespace:
 ```C++
 template <typename T, size_t BlockSize = 4096>
 ```
 
+### CMake (FetchContent)
+
+The C++11 implementation can be consumed directly with CMake `FetchContent`:
+
+```cmake
+include(FetchContent)
+
+FetchContent_Declare(
+  MemoryPool
+  GIT_REPOSITORY https://github.com/eeliu/MemoryPool.git
+  GIT_TAG master
+)
+
+FetchContent_MakeAvailable(MemoryPool)
+
+target_link_libraries(your_target PRIVATE MemoryPool::C11)
+```
+
+The exported target is header-only and automatically adds the include directory for `MemoryPool.hpp`.
+
 Here, `T` is the type of the objects you want to allocate and `BlockSize` is the size of the chunks MemoryPool allocates (see [Picking BlockSize] (#picking-blocksize) for more information). `T` can be any object, while `BlockSize` needs to be at least twice the size of `T`. After that, you create an instance of `MemoryPool` class and use it just like a standard allocator object. Here is an example:
 ```C++
 #include <iostream>
-#include "MemoryPool.h"
+#include "MemoryPool.hpp"
 
 int main()
 {
@@ -63,7 +83,7 @@ int main()
 Normally, if `T` is a class that has a non-default constructor, you need to call `MemoryPool.construct(pointer)` on the returned pointer before use and `MemoryPool.destroy(pointer)` after. Apart from the standard allocator functions, MemoryPool defines two new functions: `newElement(Args...)` and `deleteElement(pointer)`. These functions behave just like the standard `new` and `delete` functions and eliminate the need to call constructors and destructors separately. The only difference is that they can only allocate space for a type `T` object. We can rewrite the code above using these functions (we did not use them since `size_t` does not need to be constructed):
 ```C++
 #include <iostream>
-#include "MemoryPool.h"
+#include "MemoryPool.hpp"
 
 int main()
 {

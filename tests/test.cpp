@@ -40,7 +40,7 @@
 #include <time.h>
 #include <vector>
 
-#include "MemoryPool.h"
+#include "MemoryPool.hpp"
 #include "StackAlloc.h"
 
 /* Adjust these values depending on how much you trust your computer */
